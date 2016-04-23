@@ -12,6 +12,8 @@ end
 class AtomCharactorCreator
   include Singleton
 
+  BASE_DIR = Dir.home + "/.atom/packages/atom-pronama-chan/assets"
+
   def input
     begin
       arg = ARGV[0]
@@ -46,8 +48,6 @@ class AtomCharactorCreator
     puts 'Input charactor name: '
     char_name = STDIN.gets.chomp
 
-    BASE_DIR = Dir.home + "/.atom/packages/atom-pronama-chan/assets"
-
     if Dir.exist?("#{BASE_DIR}/#{char_name}") then
       puts "#{char_name} is already exists."
     else
@@ -68,3 +68,4 @@ class AtomCharactorCreator
 }""")
     end
   end
+end
