@@ -4,9 +4,7 @@ require 'singleton'
 class InvalidImageError < StandardError
 end
 
-class Main
-  include Singleton
-  AtomCharactorCreator.instance.input
+class InvalidInputError < StandardError
 end
 
 class AtomCharactorCreator
@@ -45,27 +43,38 @@ class AtomCharactorCreator
   end
 
   def setup(file)
+    begin
     puts 'Input charactor name: '
     char_name = STDIN.gets.chomp
 
-    if Dir.exist?("#{BASE_DIR}/#{char_name}") then
-      puts "#{char_name} is already exists."
+    raise InvalidInputError if char_name == nil
+    rescue
+      puts 'Invalid Input.'
     else
-      `mkdir #{BASE_DIR}/#{char_name}`
-      `mkdir #{BASE_DIR}/#{char_name}/image/`
-      `cp #{File.absolute_path(file)} #{BASE_DIR}/#{char_name}/image/`
-      `mkdir #{BASE_DIR}/#{char_name}/voice/`
-      `touch #{BASE_DIR}/#{char_name}/config.json`
+      if Dir.exist?("#{BASE_DIR}/#{char_name}") then
+        puts "#{char_name} is already exists."
+      else
+        `mkdir #{BASE_DIR}/#{char_name}`
+        `mkdir #{BASE_DIR}/#{char_name}/image/`
+        `cp #{File.absolute_path(file)} #{BASE_DIR}/#{char_name}/image/`
+        `mkdir #{BASE_DIR}/#{char_name}/voice/`
+        `touch #{BASE_DIR}/#{char_name}/config.json`
 
-      config_file = File.open("#{BASE_DIR}/#{char_name}/config.json", "w")
+        config_file = File.open("#{BASE_DIR}/#{char_name}/config.json", "w")
 
-      config_file.print("""{
-  \"images\": {
-    \"background\": \"#{File.basename(file)}\"
-  },
-  \"startVoice\": {},
-  \"timeSignal\": []
-}""")
+        config_file.print("""{
+    \"images\": {
+      \"background\": \"#{File.basename(file)}\"
+    },
+    \"startVoice\": {},
+    \"timeSignal\": []
+  }""")
+      end
     end
   end
+end
+
+class Main
+  include Singleton
+  AtomCharactorCreator.instance.input
 end
