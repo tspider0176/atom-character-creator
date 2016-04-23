@@ -1,8 +1,30 @@
-arg = ARGV[0]
-file = File.open(arg)
+class InvalidImageError < StandardError
+end
 
-case File.extname(file)
-when '.png', '.jpg', '.gif' then
+def isValidImage?(file)
+  case File.extname(file)
+  when '.png', '.jpg', '.gif'
+    true
+  else
+    false
+  end
+end
+
+begin
+  arg = ARGV[0]
+  file = File.open(arg)
+
+  raise InvalidImageError unless isValidImage?(file)
+rescue TypeError # 引数ミスの補足
+  puts 'Usage: ruby creator.rb [image]'
+rescue Errno::ENOENT => e # ファイルが存在しない場合の補足
+  puts "#{e}"
+rescue InvalidImageError # 対応しない画像形式が入力された時の補足
+  puts 'Invalid Image file.'
+  puts 'Valid type: *.png, *.jpg, *.gif'
+rescue
+  puts 'A fatal error occured during file I/O'
+else
   puts 'Input charactor name: '
   char_name = STDIN.gets.chomp
 
@@ -27,6 +49,4 @@ when '.png', '.jpg', '.gif' then
   \"timeSignal\": []
 }""")
   end
-else
-  puts 'Invalid input file.'
 end
